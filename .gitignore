@@ -1,0 +1,7 @@
+!.gitignore
+
+
+/Examples
+/Docs
+/*/.idea
+
