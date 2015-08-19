@@ -18,6 +18,7 @@
 import socket
 import random
 
+# ----------------Network socket setup------------------------
 # Create a socket: IPv4 protocol and sends UDP datagrams
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -27,19 +28,30 @@ s_socket.bind(('', server_port))
 
 # Max message size
 buffer_size = 4096
+# -------------------------------------------------------------
 
-answer = b'abcd'
+# --------------define functions-------------------------------
+# must use list b/c strings are immutable
+answer = ['g', 'g', 'g', 'g']
+guess = 0
 
+
+## function to start a new game
 def newGame():
-    letters = b'abcdef'
-    print(letters)
+    letters = ['a', 'b', 'c', 'd', 'e', 'f']
+    # randomly generate an answer
     for c in range(4):
-        #answer[c] = random.choice(letters)
-        print(answer)
+        answer[c] = random.choice(letters)
+    guess = 0
 
+    print("answer is ", answer)
+
+
+# first initialization
 newGame()
 
-# Infinite loop
+
+## Main infinite loop ##
 while (True):
 
     # Wait for messsage from client
@@ -48,15 +60,14 @@ while (True):
     print("Client address: ", cAddress)
 
     if cData == "reset":
-       newGame()
+        newGame()
 
 
 
-# Reply to client
-s_socket.sendto(b'server response', cAddress)
+    # Reply to client
+    s_socket.sendto(b'server response', cAddress)
+# END LOOP
 
 # After infinite loop. Never called
 s_socket.close()
 del s_socket
-
-
