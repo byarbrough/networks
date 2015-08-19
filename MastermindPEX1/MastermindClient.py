@@ -23,8 +23,16 @@ c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_name = '127.0.0.1' # localhost
 server_port = 1055 #same machine
 
-message = b'this is the request'
-c_socket.sendto(message, (server_name, server_port))
+## function for sending message to server
+def sendM(m):
+    m = m.upper()
+    c_socket.sendto(m, (server_name, server_port))
+    print(m)
+
+sendM(b'reset')
+
+# c_socket.sendto(message, (server_name, server_port))
+
 
 # Wait for the response from the server; max buffer size
 buffer_size = 4096

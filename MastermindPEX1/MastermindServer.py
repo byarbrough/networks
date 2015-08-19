@@ -38,7 +38,7 @@ guess = 0
 
 ## function to start a new game
 def newGame():
-    letters = ['a', 'b', 'c', 'd', 'e', 'f']
+    letters = ['A', 'B', 'C', 'D', 'E', 'F']
     # randomly generate an answer
     for c in range(4):
         answer[c] = random.choice(letters)
@@ -59,8 +59,11 @@ while (True):
     print("Message: ", cData)
     print("Client address: ", cAddress)
 
-    if cData == "reset":
+    if cData == b'RESET':
+        s_socket.sendto(b'RESET_REPLY', cAddress)
         newGame()
+    elif cData == b'HISTORY':
+        s_socket.sendto(b'HISTORY_REPLY', cAddress)
 
 
 
