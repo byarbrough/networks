@@ -28,14 +28,17 @@ buffer_size = 4096
 def sendM(m):
     m = m.upper()
     c_socket.sendto(m, (server_name, server_port))
-    
+    # Wait for the response from the server; max buffer size
+    return c_socket.recvfrom(buffer_size)
 
-# Wait for the response from the server; max buffer size
-(response, server_address) = c_socket.recvfrom(buffer_size)
+# send message to server and store reply
+(reply, server_address) = sendM(b'history')
+print(reply)
 
-#print response from server
-print("Server response: ", response)
-print("Server address:  ", server_address)
+
+
+#(response, server_address) = c_socket.recvfrom(buffer_size)
+
 
 # Close the socket and delete from memory
 c_socket.close()
