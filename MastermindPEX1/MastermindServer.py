@@ -66,9 +66,6 @@ while (True):
         s_socket.sendto(b'HISTORY_REPLY', cAddress)
 
 
-
-    # Reply to client
-    s_socket.sendto(b'server response', cAddress)
 # END LOOP
 
 # After infinite loop. Never called
