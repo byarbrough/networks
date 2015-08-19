@@ -16,6 +16,7 @@
 # The socket library allows for the creation and use of the TCP and UDP protocols.
 # See https://docs.python.org/3/library/socket.html
 import socket
+import random
 
 # Create a socket: IPv4 protocol and sends UDP datagrams
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,17 +28,35 @@ s_socket.bind(('', server_port))
 # Max message size
 buffer_size = 4096
 
+answer = b'abcd'
+
+def newGame():
+    letters = b'abcdef'
+    print(letters)
+    for c in range(4):
+        #answer[c] = random.choice(letters)
+        print(answer)
+
+newGame()
+
 # Infinite loop
 while (True):
 
     # Wait for messsage from client
-    (data, client_address) = s_socket.recvfrom(buffer_size)
-    print("Message: ", data)
-    print("Client address: ", client_address)
+    (cData, cAddress) = s_socket.recvfrom(buffer_size)
+    print("Message: ", cData)
+    print("Client address: ", cAddress)
 
-    # Reply to client
-    s_socket.sendto(b'server response', client_address)
+    if cData == "reset":
+       newGame()
+
+
+
+# Reply to client
+s_socket.sendto(b'server response', cAddress)
 
 # After infinite loop. Never called
 s_socket.close()
 del s_socket
+
+
