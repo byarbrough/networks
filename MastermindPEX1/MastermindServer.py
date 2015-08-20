@@ -46,6 +46,9 @@ def newGame():
 
     print("answer is ", answer)
 
+def replyM(m):
+    m = m.upper()
+    s_socket.sendto(m.encode('utf-8'), cAddress)
 
 # first initialization
 newGame()
@@ -60,10 +63,12 @@ while (True):
     print("Client address: ", cAddress)
 
     if cData == b'RESET':
-        s_socket.sendto(b'RESET_REPLY', cAddress)
+        replyM("RESET_REPLY")
         newGame()
     elif cData == b'HISTORY':
-        s_socket.sendto(b'HISTORY_REPLY', cAddress)
+        replyM("HISTORY_REPLY")
+    else:
+        replyM("ERROR_REPLY")
 
 
 # END LOOP

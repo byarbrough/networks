@@ -32,7 +32,9 @@ def sendM(m):
     m = m.upper()
     c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
     # Wait for the response from the server; max buffer size
-    return c_socket.recvfrom(buffer_size)
+    (reply, server_address) = c_socket.recvfrom(buffer_size)
+    print(reply.decode())
+    return (reply, server_address)
 
 # send message to server and store reply
 (reply, server_address) = sendM('history')
@@ -47,12 +49,10 @@ while (playing):
     cmd = input("Enter Command: ").upper()
     if cmd == "?":
         print("help menu")
-    elif cmd == "RESET":
-        sendM(cmd)
     elif cmd == "QUIT":
         playing = False
     else:
-        print("Invalid Input")
+        sendM(cmd)
 
 # Close the socket and delete from memory
 c_socket.close()
