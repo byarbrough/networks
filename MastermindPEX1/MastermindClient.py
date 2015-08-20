@@ -15,7 +15,6 @@
 # The socket library allows for the creation and use of the TCP and UDP protocols.
 # See https://docs.python.org/3/library/socket.html
 import socket
-import MasMindF
 
 # Create a new socket on random port
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -39,7 +38,21 @@ def sendM(m):
 (reply, server_address) = sendM('history')
 print(reply.decode())
 
+# send initial request to server
+sendM("reset")
+print("Welcome to Mastermind!")
 
+# Main loop for game
+while (playing):
+    cmd = input("Enter Command: ").upper()
+    if cmd == "?":
+        print("help menu")
+    elif cmd == "RESET":
+        sendM(cmd)
+    elif cmd == "QUIT":
+        playing = False
+    else:
+        print("Invalid Input")
 
 # Close the socket and delete from memory
 c_socket.close()
