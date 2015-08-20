@@ -31,10 +31,9 @@ buffer_size = 4096
 # -------------------------------------------------------------
 
 # --------------define functions-------------------------------
-# must use list b/c strings are immutable
 answer = ['g', 'g', 'g', 'g']
-guess = 0
-
+nGuess = 0
+history = []
 
 ## function to start a new game
 def newGame():
@@ -50,6 +49,16 @@ def replyM(m):
     m = m.upper()
     s_socket.sendto(m.encode('utf-8'), cAddress)
 
+def handleGuess(d):
+    nCorrect = 0
+    g = d # needs to be made more robust
+    history[nGuess*2]= g #store the guess
+    history[nGuess*2+1] = nCorrect #store the number correct
+    print("Guess is ",g)
+
+def handleHistory():
+    replyM("HISTORY_REPLY")
+
 # first initialization
 newGame()
 
@@ -59,14 +68,17 @@ while (True):
 
     # Wait for messsage from client
     (cData, cAddress) = s_socket.recvfrom(buffer_size)
+    cData = cData.decode()
     print("Message: ", cData)
     print("Client address: ", cAddress)
-
-    if cData == b'RESET':
+    # Handle client message
+    if cData == 'RESET':
         replyM("RESET_REPLY")
         newGame()
-    elif cData == b'HISTORY':
+    elif cData == 'HISTORY':
         replyM("HISTORY_REPLY")
+    elif cData.startswith("GUESS,"):
+        handleGuess(cData)
     else:
         replyM("ERROR_REPLY")
 
