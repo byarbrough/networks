@@ -26,7 +26,6 @@ buffer_size = 4096
 
 playing = True
 
-
 ## function for sending message to server
 def sendM(m):
     m = m.upper()
@@ -36,24 +35,23 @@ def sendM(m):
     print(reply.decode())
     return (reply, server_address)
 
-# send message to server and store reply
-(reply, server_address) = sendM('history')
-print(reply.decode())
 
 # send initial request to server
 sendM("reset")
-print("Welcome to Mastermind!")
+
+print('\r\nWelcome to Mastermind!')
 
 # Main loop for game
 while (playing):
-    cmd = input("Enter Command: ").upper()
+    cmd = input('Enter Command: ').upper()
     if cmd == "?":
-        print("help menu")
-    elif cmd == "QUIT":
+        print('help menu')
+    elif cmd == 'QUIT':
         playing = False
     else:
         sendM(cmd)
 
 # Close the socket and delete from memory
+print("Goodbye")
 c_socket.close()
 del c_socket

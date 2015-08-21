@@ -17,6 +17,7 @@
 # See https://docs.python.org/3/library/socket.html
 import socket
 import random
+import queue
 
 # ----------------Network socket setup------------------------
 # Create a socket: IPv4 protocol and sends UDP datagrams
@@ -50,21 +51,25 @@ def replyM(m):
     s_socket.sendto(m.encode('utf-8'), cAddress)
 
 def handleGuess(d):
+    print(d)
     nCorrect = 0
-    g = d # needs to be made more robust
-    history[nGuess*2]= g #store the guess
-    history[nGuess*2+1] = nCorrect #store the number correct
-    print("Guess is ",g)
+    #g = d  # needs to be made more robust
+    #history[nGuess*2] = g  # store the guess
+    #history[nGuess*2+1] = nCorrect  # store the number correct
+    #print("Guess is ",g)
 
 def handleHistory():
-    replyM("HISTORY_REPLY")
+    reply = 'HISTORY_REPLY' + str(history)
+    replyM(reply)
+
+
 
 # first initialization
 newGame()
 
 
 ## Main infinite loop ##
-while (True):
+while True:
 
     # Wait for messsage from client
     (cData, cAddress) = s_socket.recvfrom(buffer_size)
@@ -73,14 +78,14 @@ while (True):
     print("Client address: ", cAddress)
     # Handle client message
     if cData == 'RESET':
-        replyM("RESET_REPLY")
+        replyM('RESET_REPLY')
         newGame()
     elif cData == 'HISTORY':
-        replyM("HISTORY_REPLY")
-    elif cData.startswith("GUESS,"):
+        replyM('HISTORY_REPLY')
+    elif cData.startswith('GUESS,'):
         handleGuess(cData)
     else:
-        replyM("ERROR_REPLY")
+        replyM('ERROR_REPLY')
 
 
 # END LOOP
