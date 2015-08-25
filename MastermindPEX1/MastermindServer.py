@@ -33,7 +33,7 @@ buffer_size = 4096
 
 # --------------define functions-------------------------------
 answer = ['g', 'g', 'g', 'g']
-nGuess = 0
+nGuess = 1
 global history
 
 ## function to start a new game
@@ -44,7 +44,7 @@ def newGame():
     # randomly generate an answer
     for c in range(4):
         answer[c] = random.choice(letters)
-    nGuess = 0
+    nGuess = 1
 
     print("answer is ", answer)
 
@@ -59,16 +59,24 @@ def handleGuess(g):
     guess = parted[2].strip() # Remove whitespace and store guess
     # Check for errors in guess
     if len(guess) != 4:
-        print("Bad Length")
+        replyM('ERROR_REPLY, BAD LENGTH')
+        return
     nCorrect = 0
     for i in range(4):
         if answer[i] == guess[i]:
             nCorrect += 1
     #history[nGuess*2] = g  # store the guess
     #history[nGuess*2+1] = nCorrect  # store the number correct
-    print("Guess is ",guess)
-    nGuess += 1
-    replyM('GUESS_REPLY '+ str(nCorrect) + ' letters correct')
+
+    # Check for wins/ losses, reply to user
+    if nCorrect == 4:
+        replyM('YOU WIN!')
+    elif nGuess == 10:
+        replyM('GAME OVER')
+    else:
+        replyM('GUESS_REPLY '+ 'guess # ' + str(nGuess) + ': ' + str(nCorrect) + ' letters correct')
+        nGuess += 1
+
 
 def handleHistory():
     reply = 'HISTORY_REPLY' + str(history)
