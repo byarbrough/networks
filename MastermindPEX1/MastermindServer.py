@@ -34,15 +34,17 @@ buffer_size = 4096
 # --------------define functions-------------------------------
 answer = ['g', 'g', 'g', 'g']
 nGuess = 0
-history = []
+global history
 
 ## function to start a new game
 def newGame():
+    global nGuess
+
     letters = ['A', 'B', 'C', 'D', 'E', 'F']
     # randomly generate an answer
     for c in range(4):
         answer[c] = random.choice(letters)
-    guess = 0
+    nGuess = 0
 
     print("answer is ", answer)
 
@@ -50,13 +52,23 @@ def replyM(m):
     m = m.upper()
     s_socket.sendto(m.encode('utf-8'), cAddress)
 
-def handleGuess(d):
-    print(d)
+def handleGuess(g):
+    global nGuess
+
+    parted = g.partition(',') # Split into array
+    guess = parted[2].strip() # Remove whitespace and store guess
+    # Check for errors in guess
+    if len(guess) != 4:
+        print("Bad Length")
     nCorrect = 0
-    #g = d  # needs to be made more robust
+    for i in range(4):
+        if answer[i] == guess[i]:
+            nCorrect += 1
     #history[nGuess*2] = g  # store the guess
     #history[nGuess*2+1] = nCorrect  # store the number correct
-    #print("Guess is ",g)
+    print("Guess is ",guess)
+    nGuess += 1
+    replyM('GUESS_REPLY '+ str(nCorrect) + ' letters correct')
 
 def handleHistory():
     reply = 'HISTORY_REPLY' + str(history)
@@ -66,7 +78,6 @@ def handleHistory():
 
 # first initialization
 newGame()
-
 
 ## Main infinite loop ##
 while True:
