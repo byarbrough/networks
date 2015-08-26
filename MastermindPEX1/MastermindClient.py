@@ -15,25 +15,27 @@
 # The socket library allows for the creation and use of the TCP and UDP protocols.
 # See https://docs.python.org/3/library/socket.html
 import socket
+import sys
 
 # Create a new socket on random port
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Send a request to the server.
-server_name = '127.0.0.1' # localhost
-server_port = 1055 #same machine
+server_name = '127.0.0.1'  # localhost
+server_port = 1055  # same machine
 buffer_size = 4096
 
 playing = True
 
-## function for sending message to server
+
+# function for sending message to server
 def sendM(m):
     m = m.upper()
     c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
     # Wait for the response from the server; max buffer size
     (reply, server_address) = c_socket.recvfrom(buffer_size)
     print(reply.decode())
-    return (reply, server_address)
+    return reply, server_address
 
 
 # send initial request to server
@@ -42,7 +44,7 @@ sendM("reset")
 print('\r\nWelcome to Mastermind!')
 
 # Main loop for game
-while (playing):
+while playing:
     cmd = input('Enter Command: ').upper()
     if cmd == "?":
         print('help menu')
