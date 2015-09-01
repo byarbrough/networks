@@ -76,7 +76,7 @@ def handleGuess(g):
     # Traverse answer
     for i in range(4):
         # Check for invalid characters
-        if answer[i] not in ['A', 'B', 'C', 'D', 'E', 'F']:
+        if guess[i] not in ['A', 'B', 'C', 'D', 'E', 'F']:
             replyM('ERROR_REPLY, ' + g)
             return
         # Count correct letter

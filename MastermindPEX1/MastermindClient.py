@@ -68,7 +68,6 @@ print("\r\nEnter a four letter guess or ? for help\r\n")
 while playing:
     cmd = input("Enter a guess: ").upper()
     if cmd == "?":
-        cmd = 'HISTORY'
         printHelp()
     elif cmd == 'QUIT':
         playing = False
@@ -77,6 +76,7 @@ while playing:
 
     reply, address = sendM(cmd)
     reply = reply.decode()
+
     # Handle Replies from Server
     if reply.startswith('FEEDBACK_REPLY'):
         nums = reply.split(',')
@@ -89,8 +89,7 @@ while playing:
         print("Previous answer: " + str(ans[1:5]).strip('["] ') + " with " + str(ans[5]) + " guesses remaining.")
         print("New Game Started")
     elif reply.startswith('ERROR_REPLY'):
-        err = reply.split(',')
-        print("There was an error with your input: " + str(err[1]))
+        print("There was an error with your input: " + str(reply))
     else:
         print(reply)
 
