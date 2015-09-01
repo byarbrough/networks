@@ -23,8 +23,15 @@ import sys
 # Create a socket: IPv4 protocol and sends UDP datagrams
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# Assign socket arbitrary port greater than 1023
-server_port = 1055
+server_port = 12345
+if len(sys.argv) == 2:
+    try:
+        server_port = int(sys.argv[1])
+    except TypeError:
+        print("Argument: Port must be an integer")
+elif len(sys.argv) > 2:
+    raise SyntaxError("Server only excepts one argument <port>")
+
 s_socket.bind(('', server_port))
 
 # Max message size
@@ -103,6 +110,7 @@ while True:
     # Wait for message from client
     (cData, cAddress) = s_socket.recvfrom(buffer_size)
     cData = cData.decode()
+    
     print("Message: ", cData)
     print("Client address: ", cAddress)
     # Handle client message
