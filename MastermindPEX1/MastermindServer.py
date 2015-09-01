@@ -40,7 +40,7 @@ buffer_size = 4096
 
 # --------------define functions-------------------------------
 answer = ['g', 'g', 'g', 'g']
-nGuess = 9
+nGuess = 10
 global history
 
 
@@ -52,7 +52,7 @@ def newGame():
     # randomly generate an answer
     for c in range(4):
         answer[c] = random.choice(letters)
-    nGuess = 9
+    nGuess = 10
 
     print("answer is ", answer)
 
@@ -89,11 +89,13 @@ def handleGuess(g):
     # Check for wins/ losses, reply to user
     if nCorrect == 4:
         replyM('YOU WIN!')
-    elif nGuess == 0:
-        replyM('GAME OVER')
     else:
-        replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
         nGuess -= 1
+        if nGuess <= 0:
+            replyM("GAME OVER, please reset")
+        else:
+            replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
+
 
 
 def handleHistory():
@@ -110,7 +112,7 @@ while True:
     # Wait for message from client
     (cData, cAddress) = s_socket.recvfrom(buffer_size)
     cData = cData.decode()
-    
+
     print("Message: ", cData)
     print("Client address: ", cAddress)
     # Handle client message

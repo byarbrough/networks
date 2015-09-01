@@ -17,6 +17,22 @@
 import socket
 import sys
 
+# function for sending message to server
+def sendM(m):
+    m = m.upper()
+    c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
+    # Wait for the response from the server; max buffer size
+    (reply, server_address) = c_socket.recvfrom(buffer_size)
+    return reply, server_address
+
+def printHelp():
+    print("Mastermind Client, by Brian Yarbrough")
+    print("All guesses must be four letters")
+    print("Guesses may only caontain the letters a-f")
+    print("Enter 'history' to see your guesses")
+    print("Enter 'reset' to start a new game")
+    print("Enter quit to leave the game\r\n")
+
 # Create a new socket on random port
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -24,6 +40,7 @@ c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_name = '127.0.0.1'  # localhost
 server_port = 12345  # same machine
 
+# Handle Arguments
 if len(sys.argv) == 3:
     try:
         server_name = str(sys.argv[1])
@@ -37,47 +54,48 @@ elif len(sys.argv) > 3:
 
 buffer_size = 4096
 
-# Handle Arguments
-
-
 playing = True
-
-
-# function for sending message to server
-def sendM(m):
-    m = m.upper()
-    c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
-    # Wait for the response from the server; max buffer size
-    (reply, server_address) = c_socket.recvfrom(buffer_size)
-    return reply, server_address
-
+print("\r\nWelcome to Mastermind!")
 
 # send initial request to server
-sendM("reset")
-
-print('\r\nWelcome to Mastermind!')
+reply, addr = sendM('HISTORY')
+print("Successful connection to " + str(addr[0]) + " on port " + str(addr[1]))
+print("Current Server State: ")
+print(reply.decode())
+print("\r\nEnter a four letter guess or ? for help\r\n")
 
 # Main loop for game
 while playing:
-    cmd = input('Enter Command: ').upper()
+    cmd = input("Enter a guess: ").upper()
     if cmd == "?":
-        print('help menu')
+        cmd = 'HISTORY'
+        printHelp()
     elif cmd == 'QUIT':
         playing = False
+    elif len(cmd) == 4:
+        cmd = "GUESS, " + cmd
+
+    reply, address = sendM(cmd)
+    reply = reply.decode()
+    # Handle Replies from Server
+    if reply.startswith('FEEDBACK_REPLY'):
+        nums = reply.split(',')
+        print(str(nums[1]) + " letters correct, " + str(nums[2]) + ' guesses remaining')
+    elif reply.startswith('HISTORY_REPLY'):
+        print("Guesses for this game: ")
+        print(reply)
+    elif reply.startswith('RESET_REPLY'):
+        ans = reply.split(',')
+        print("Previous answer: " + str(ans[1:5]).strip('["] ') + " with " + str(ans[5]) + " guesses remaining.")
+        print("New Game Started")
+    elif reply.startswith('ERROR_REPLY'):
+        err = reply.split(',')
+        print("There was an error with your input: " + str(err[1]))
     else:
-        reply, address = sendM(cmd)
-        reply = reply.decode()
-        # Handle Replies from Server
-        if reply.startswith('FEEDBACK_REPLY'):
-            nums = reply.split(',')
-            print(str(nums[1]) + ' letters correct, ' + str(nums[2]) + ' guesses remaining')
-        else:
-            print(reply)
+        print(reply)
 
 
 # Close the socket and delete from memory
-print("Goodbye")
+print('Goodbye')
 c_socket.close()
 del c_socket
-
-# python myserver.py host port
