@@ -41,7 +41,7 @@ buffer_size = 4096
 # --------------define functions-------------------------------
 answer = ['g', 'g', 'g', 'g']
 nGuess = 10
-global history
+record = []
 
 
 # function to start a new game
@@ -83,9 +83,9 @@ def handleGuess(g):
         elif answer[i] == guess[i]:
             nCorrect += 1
 
-    # history[nGuess*2] = g  # store the guess
-    # history[nGuess*2+1] = nCorrect  # store the number correct
-
+    # Store the guess
+    record.append(11-nGuess)
+    record.append(guess)
     # Check for wins/ losses, reply to user
     if nCorrect == 4:
         replyM('YOU WIN!')
@@ -99,7 +99,7 @@ def handleGuess(g):
 
 
 def handleHistory():
-    reply = 'HISTORY_REPLY' + str(history)
+    reply = 'HISTORY_REPLY' + str(record)
     replyM(reply)
 
 
@@ -120,7 +120,7 @@ while True:
         replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
         newGame()
     elif cData == 'HISTORY':
-        replyM('HISTORY_REPLY')
+        handleHistory()
     elif cData.startswith('GUESS,'):
         handleGuess(cData)
     else:
