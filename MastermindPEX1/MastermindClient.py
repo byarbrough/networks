@@ -16,6 +16,7 @@
 # See https://docs.python.org/3/library/socket.html
 import socket
 import sys
+import string
 
 # function for sending message to server
 def sendM(m):
@@ -28,10 +29,28 @@ def sendM(m):
 def printHelp():
     print("Mastermind Client, by Brian Yarbrough")
     print("All guesses must be four letters")
-    print("Guesses may only caontain the letters a-f")
+    print("Guesses may only contain the letters a-f")
     print("Enter 'history' to see your guesses")
     print("Enter 'reset' to start a new game")
-    print("Enter quit to leave the game\r\n")
+    print("Enter 'quit' to leave the game")
+
+def printHistory(h):
+    for i in range(len(h)-1):
+        print("bob")
+
+def printReset(r):
+    reply = r.split(',')
+    ans = str(reply[1])
+    ans += str(reply[2])
+    ans += str(reply[3])
+    ans += str(reply[4])
+    answer = ''
+    for i in range(18):
+        if ans[i] in string.ascii_letters:
+            answer += ans[i]
+    print("Previous answer: " + answer + " with " + str(reply[5]) + " guesses remaining.")
+    print("New Game Started\r\n")
+
 
 # Create a new socket on random port
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -71,25 +90,26 @@ while playing:
         printHelp()
     elif cmd == 'QUIT':
         playing = False
-    elif len(cmd) == 4:
+    elif len(cmd) == 4: # Assume input is a guess
         cmd = "GUESS, " + cmd
 
-    reply, address = sendM(cmd)
-    reply = reply.decode()
+    # Send message to server via sendM()
+    reply = ''
+    if cmd != '?':
+        reply, address = sendM(cmd)
+        reply = reply.decode()
 
     # Handle Replies from Server
     if reply.startswith('FEEDBACK_REPLY'):
         nums = reply.split(',')
         print(str(nums[1]) + " letters correct, " + str(nums[2]) + ' guesses remaining')
     elif reply.startswith('HISTORY_REPLY'):
-        print("Guesses for this game: ")
-        print(reply)
+        printHistory(reply)
     elif reply.startswith('RESET_REPLY'):
-        ans = reply.split(',')
-        print("Previous answer: " + str(ans[1:5]).strip('["] ') + " with " + str(ans[5]) + " guesses remaining.")
-        print("New Game Started")
+        printReset(reply)
     elif reply.startswith('ERROR_REPLY'):
         print("There was an error with your input: " + str(reply))
+        print("Enter ? for help")
     else:
         print(reply)
 

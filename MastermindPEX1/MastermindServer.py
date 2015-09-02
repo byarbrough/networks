@@ -36,26 +36,23 @@ s_socket.bind(('', server_port))
 
 # Max message size
 buffer_size = 4096
-# -------------------------------------------------------------
 
-# --------------define functions-------------------------------
 answer = ['g', 'g', 'g', 'g']
 nGuess = 10
 record = []
 
-
 # function to start a new game
 def newGame():
     global nGuess
-
+    global record
+    print('\r\nNEW GAME')
     letters = ['A', 'B', 'C', 'D', 'E', 'F']
     # randomly generate an answer
     for c in range(4):
         answer[c] = random.choice(letters)
     nGuess = 10
-
+    record = []
     print("answer is ", answer)
-
 
 def replyM(m):
     m = m.upper()
@@ -98,11 +95,6 @@ def handleGuess(g):
 
 
 
-def handleHistory():
-    reply = 'HISTORY_REPLY' + str(record)
-    replyM(reply)
-
-
 # first initialization
 newGame()
 
@@ -120,7 +112,8 @@ while True:
         replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
         newGame()
     elif cData == 'HISTORY':
-        handleHistory()
+        reply = 'HISTORY_REPLY' + str(record)
+        replyM(reply)
     elif cData.startswith('GUESS,'):
         handleGuess(cData)
     else:
@@ -129,6 +122,6 @@ while True:
 
 # END LOOP
 
-# After infinite loop. Never called
+# After infinite loop... never called
 s_socket.close()
 del s_socket
