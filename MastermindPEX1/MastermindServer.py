@@ -85,11 +85,15 @@ def handleGuess(g):
     record.append(nCorrect)
     # Check for wins/ losses, reply to user
     if nCorrect == 4:
-        replyM('YOU WIN!')
+        print('Win')
+        replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
+        newGame()
     else:
         nGuess -= 1
         if nGuess <= 0:
-            replyM("GAME OVER, please reset")
+            print('Loss')
+            replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
+            newGame()
         else:
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
 
