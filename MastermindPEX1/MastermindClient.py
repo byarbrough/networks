@@ -16,7 +16,6 @@
 # See https://docs.python.org/3/library/socket.html
 import socket
 import sys
-import string
 
 # function for sending message to server
 def sendM(m):
@@ -35,8 +34,19 @@ def printHelp():
     print("Enter 'quit' to leave the game")
 
 def printHistory(h):
-    for i in range(len(h)-1):
-        print("bob")
+    n = int(len(h)/11)-1 # Number of guesses
+    print('\tGuess\tNumber Correct')
+    for i in range(1,n):
+        shift = int(14 + (i-1)*11)
+        print(shift)
+        last = int(shift + 4)
+        correct = int(i*11+11)
+        print(last)
+        print(correct)
+        print(str(h[s]))
+        #print('\t' + str(h[shift, last]) + '\t' + str(h[correct]))
+    print(reply)
+    print(len(reply))
 
 def printReset(r):
     reply = r.split(',')
@@ -46,7 +56,7 @@ def printReset(r):
     ans += str(reply[4])
     answer = ''
     for i in range(18):
-        if ans[i] in string.ascii_letters:
+        if ans[i].isalpha():
             answer += ans[i]
     print("Previous answer: " + answer + " with " + str(reply[5]) + " guesses remaining.")
     print("New Game Started\r\n")

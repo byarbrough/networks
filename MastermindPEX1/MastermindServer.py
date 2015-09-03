@@ -81,8 +81,8 @@ def handleGuess(g):
             nCorrect += 1
 
     # Store the guess
-    record.append(11-nGuess)
     record.append(guess)
+    record.append(nCorrect)
     # Check for wins/ losses, reply to user
     if nCorrect == 4:
         replyM('YOU WIN!')
