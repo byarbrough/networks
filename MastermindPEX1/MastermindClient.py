@@ -21,9 +21,21 @@ import sys
 def sendM(m):
     m = m.upper()
     c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
-    # Wait for the response from the server; max buffer size
-    (reply, server_address) = c_socket.recvfrom(buffer_size)
-    return reply, server_address
+    # Wait for the response from the server; max buffer size; 5 second timeout
+    try:
+        (reply, server_address) = c_socket.recvfrom(buffer_size)
+        print('tried')
+    except socket.timeout:
+        (reply, server_address) = (b'',b'')
+        print("Did not receive response from server; server possibly down.")
+    except ConnectionResetError:
+        (reply, server_address) = (b'',b'')
+        print("Error: connection to server reset")
+    except:
+        (reply, server_address) = (b'',b'')
+        print("Unexpected error: ", sys.exc_info()[0])
+    finally:
+        return reply, server_address
 
 def printHelp():
     print("Mastermind Client, by Brian Yarbrough")
@@ -43,7 +55,7 @@ def printHistory(h):
         correct = int(i*11+11)
         print(last)
         print(correct)
-        print(str(h[s]))
+        print(str(h[shift]))
         #print('\t' + str(h[shift, last]) + '\t' + str(h[correct]))
     print(reply)
     print(len(reply))
@@ -64,6 +76,10 @@ def printReset(r):
 
 # Create a new socket on random port
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+buffer_size = 4096
+c_socket.settimeout(5.0) # Five second timeout
+
+
 
 # Send a request to the server.
 server_name = '127.0.0.1'  # localhost
@@ -81,17 +97,19 @@ elif len(sys.argv) == 2:
 elif len(sys.argv) > 3:
     raise SyntaxError("Server only excepts two arguments <address> <port>")
 
-buffer_size = 4096
-
 playing = True
 print("\r\nWelcome to Mastermind!")
 
 # send initial request to server
-reply, addr = sendM('HISTORY')
-print("Successful connection to " + str(addr[0]) + " on port " + str(addr[1]))
-print("Current Server State: ")
-print(reply.decode())
-print("\r\nEnter a four letter guess or ? for help\r\n")
+try:
+    reply, addr = sendM('HISTORY')
+    print("Successful connection to " + str(addr[0]) + " on port " + str(addr[1]))
+    print("Current Server State: ")
+    print(reply.decode())
+    print("\r\nEnter a four letter guess or ? for help\r\n")
+except:
+    print("Failed to make initial connection to server:",sys.exc_info()[0])
+    exit()
 
 # Main loop for game
 while playing:

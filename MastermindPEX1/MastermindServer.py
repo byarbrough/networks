@@ -7,10 +7,9 @@
 # Based on UDPServer by Wayne Brown
 
 """
-    A demonstration of a typical server using the UDP protocol. A server typically runs
-    24/7 and ony terminates when it is killed by an administrator. Thus the infinite
-    loop. The port number is arbitrary, but it should be greater than 1023. Ports 0-1023
-    are the reserved, "well known" ports.
+    Server for Mastermind, communicates with MastermindClient.py
+    Runs continuously on infinite loop
+    Follows RFC Protocol outlined by Dr. Brown
 """
 
 # The socket library allows for the creation and use of the TCP and UDP protocols.
@@ -24,7 +23,7 @@ import sys
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 server_port = 12345
-if len(sys.argv) == 2:
+if len(sys.argv) == 2 :
     try:
         server_port = int(sys.argv[1])
     except TypeError:
@@ -40,6 +39,7 @@ buffer_size = 4096
 answer = ['g', 'g', 'g', 'g']
 nGuess = 10
 record = []
+
 
 # function to start a new game
 def newGame():
@@ -57,7 +57,6 @@ def newGame():
 def replyM(m):
     m = m.upper()
     s_socket.sendto(m.encode('utf-8'), cAddress)
-
 
 def handleGuess(g):
     global nGuess
@@ -97,8 +96,6 @@ def handleGuess(g):
         else:
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
 
-
-
 # first initialization
 newGame()
 
@@ -122,10 +119,8 @@ while True:
         handleGuess(cData)
     else:
         replyM('ERROR_REPLY, ' + str(cData))
-
-
 # END LOOP
 
-# After infinite loop... never called
+# After infinite loop... only here as a matter of principle
 s_socket.close()
 del s_socket
