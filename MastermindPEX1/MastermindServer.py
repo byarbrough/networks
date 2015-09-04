@@ -55,7 +55,10 @@ def newGame():
 
 def replyM(m):
     m = m.upper()
-    s_socket.sendto(m.encode('utf-8'), cAddress)
+    try:
+        s_socket.sendto(m.encode('utf-8'), cAddress)
+    except:
+        print("Error communicating with client")
 
 def handleGuess(g):
     global nGuess
@@ -84,14 +87,14 @@ def handleGuess(g):
     # Check for wins/ losses, reply to user
     if nCorrect == 4: # Win
         replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
-        print('Win')
-        s_socket.recvfrom(buffer_size)
+        print('Client Win')
         replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
         newGame()
     else: # Incorrect answer
         nGuess -= 1
         if nGuess <= 0: # Loss
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
+            print('Client Loss')
             replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
             newGame()
         else: # Keep guessing
