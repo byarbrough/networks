@@ -82,22 +82,19 @@ def handleGuess(g):
     record.append(guess)
     record.append(nCorrect)
     # Check for wins/ losses, reply to user
-    if nCorrect == 4:
+    if nCorrect == 4: # Win
         replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
         print('Win')
         s_socket.recvfrom(buffer_size)
         replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
         newGame()
-        replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
-        newGame()
-    else:
+    else: # Incorrect answer
         nGuess -= 1
-        if nGuess <= 0:
+        if nGuess <= 0: # Loss
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
-            s_socket.recvfrom(buffer_size)
             replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
             newGame()
-        else:
+        else: # Keep guessing
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
 
 

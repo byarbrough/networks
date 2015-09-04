@@ -97,7 +97,7 @@ print("\r\nWelcome to Mastermind!")
 try:
     reply, addr = sendM('HISTORY')
     print("Successful connection to " + str(addr[0]) + " on port " + str(addr[1]))
-    print("Current Server State: ")
+    print("\r\nCurrent Server State: ")
     printHistory(reply)
     print("\r\nEnter a four letter guess or ? for help\r\n")
 except:
@@ -126,13 +126,13 @@ while playing:
         nums = reply.split(',')
         print(str(nums[1]) + " letters correct, " + str(nums[2]) + ' guesses remaining')
         if int(nums[1]) == 4:
+            (r1, sa) = c_socket.recvfrom(buffer_size)
             print("You Won!")
-            m = b''
-            c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
+            printReset(r1.decode())
         elif int(nums[2]) == 0:
+            (r1, sa) = c_socket.recvfrom(buffer_size)
             print("Game Over!")
-            m = b''
-            c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
+            printReset(r1.decode())
     elif reply.startswith('HISTORY_REPLY'):
         printHistory(reply)
     elif reply.startswith('RESET_REPLY'):
