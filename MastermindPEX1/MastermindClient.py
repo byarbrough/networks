@@ -24,7 +24,6 @@ def sendM(m):
     # Wait for the response from the server; max buffer size; 5 second timeout
     try:
         (reply, server_address) = c_socket.recvfrom(buffer_size)
-        print('tried')
     except socket.timeout:
         (reply, server_address) = (b'',b'')
         print("Did not receive response from server; server possibly down.")
@@ -46,19 +45,15 @@ def printHelp():
     print("Enter 'quit' to leave the game")
 
 def printHistory(h):
-    n = int(len(h)/11)-1 # Number of guesses
-    print('\tGuess\tNumber Correct')
-    for i in range(1,n):
-        shift = int(14 + (i-1)*11)
-        print(shift)
-        last = int(shift + 4)
-        correct = int(i*11+11)
-        print(last)
-        print(correct)
-        print(str(h[shift]))
-        #print('\t' + str(h[shift, last]) + '\t' + str(h[correct]))
-    print(reply)
-    print(len(reply))
+    n = int((len(h))/11)-1 # Number of guesses
+    if n == 0:
+        print("No guesses yet!")
+    else:
+        h = h.lstrip('HISTORY_REPLY[')
+        print('\tGuess\t# Correct')
+        hist = h.split(',')
+        for i in range(0,len(hist),2):
+            print('\t' + hist[i].strip(" '") + '\t' + hist[i+1].strip(" ]"))
 
 def printReset(r):
     reply = r.split(',')
@@ -78,8 +73,6 @@ def printReset(r):
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 buffer_size = 4096
 c_socket.settimeout(5.0) # Five second timeout
-
-
 
 # Send a request to the server.
 server_name = '127.0.0.1'  # localhost
@@ -105,7 +98,7 @@ try:
     reply, addr = sendM('HISTORY')
     print("Successful connection to " + str(addr[0]) + " on port " + str(addr[1]))
     print("Current Server State: ")
-    print(reply.decode())
+    printHistory(reply)
     print("\r\nEnter a four letter guess or ? for help\r\n")
 except:
     print("Failed to make initial connection to server:",sys.exc_info()[0])
@@ -118,6 +111,7 @@ while playing:
         printHelp()
     elif cmd == 'QUIT':
         playing = False
+        break
     elif len(cmd) == 4: # Assume input is a guess
         cmd = "GUESS, " + cmd
 
@@ -131,6 +125,14 @@ while playing:
     if reply.startswith('FEEDBACK_REPLY'):
         nums = reply.split(',')
         print(str(nums[1]) + " letters correct, " + str(nums[2]) + ' guesses remaining')
+        if int(nums[1]) == 4:
+            print("You Won!")
+            m = b''
+            c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
+        elif int(nums[2]) == 0:
+            print("Game Over!")
+            m = b''
+            c_socket.sendto(m.encode('utf-8'), (server_name, server_port))
     elif reply.startswith('HISTORY_REPLY'):
         printHistory(reply)
     elif reply.startswith('RESET_REPLY'):

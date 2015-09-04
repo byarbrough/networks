@@ -18,7 +18,6 @@ import socket
 import random
 import sys
 
-# ----------------Network socket setup------------------------
 # Create a socket: IPv4 protocol and sends UDP datagrams
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -84,17 +83,23 @@ def handleGuess(g):
     record.append(nCorrect)
     # Check for wins/ losses, reply to user
     if nCorrect == 4:
+        replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
         print('Win')
+        s_socket.recvfrom(buffer_size)
+        replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
+        newGame()
         replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
         newGame()
     else:
         nGuess -= 1
         if nGuess <= 0:
-            print('Loss')
+            replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
+            s_socket.recvfrom(buffer_size)
             replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
             newGame()
         else:
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
+
 
 # first initialization
 newGame()
