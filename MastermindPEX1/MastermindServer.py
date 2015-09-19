@@ -2,8 +2,8 @@
 #
 # Author: Brian Yarbrough
 # PEX1, CS 467, USAFA
-# August 2015
-#
+# September 2015
+# Version 1.1
 # Based on UDPServer by Wayne Brown
 
 """
@@ -55,6 +55,7 @@ def newGame():
 
 def replyM(m):
     m = m.upper()
+    print('Response; ' + m)
     try:
         s_socket.sendto(m.encode('utf-8'), cAddress)
     except:
@@ -67,7 +68,7 @@ def handleGuess(g):
     guess = parted[2].strip()  # Remove whitespace and store guess
     # Check for bad length
     if len(guess) != 4:
-        replyM('ERROR_REPLY, ' + g)
+        replyM('ERROR_REPLY, ' + '"' + g + '"')
         return
 
     nCorrect = 0
@@ -75,7 +76,7 @@ def handleGuess(g):
     for i in range(4):
         # Check for invalid characters
         if guess[i] not in ['A', 'B', 'C', 'D', 'E', 'F']:
-            replyM('ERROR_REPLY, ' + g)
+            replyM('ERROR_REPLY, ' + '"' + g + '"')
             return
         # Count correct letter
         elif answer[i] == guess[i]:
@@ -118,12 +119,16 @@ while True:
         replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
         newGame()
     elif cData == 'HISTORY':
-        reply = 'HISTORY_REPLY' + str(record)
-        replyM(reply)
+        if len(record) == 0:
+            replyM('HISTORY_REPLY')
+        else:
+            reply = 'HISTORY_REPLY,' + str(record).strip('[]')
+            print('Reply will be: ', reply)
+            replyM(reply)
     elif cData.startswith('GUESS,'):
         handleGuess(cData)
     else:
-        replyM('ERROR_REPLY, ' + str(cData))
+        replyM('ERROR_REPLY, ' + '"' + str(cData) + '"')
 # END LOOP
 
 # After infinite loop... only here as a matter of principle

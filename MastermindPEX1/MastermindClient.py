@@ -2,8 +2,8 @@
 #
 # Author: Brian Yarbrough
 # PEX1, CS 467, USAFA
-# August 2015
-#
+# September 2015
+# Version 1.1
 # Based on UDPClient by Wayne Brown
 
 """
