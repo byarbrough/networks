@@ -45,15 +45,13 @@ def printHelp():
     print("Enter 'quit' to leave the game")
 
 def printHistory(h):
-    n = int((len(h))/11)-1 # Number of guesses
-    if n == 0:
-        print("No guesses yet!")
+    h = h.lstrip('HISTORY_REPLY,')
+    hist = h.split(',')
+    if len(hist) == 1:
+        print('No guesses yet!')
     else:
-        h = h.lstrip('HISTORY_REPLY[')
-        print('\tGuess\t# Correct')
-        hist = h.split(',')
         for i in range(0,len(hist),2):
-            print('\t' + hist[i].strip(" '") + '\t' + hist[i+1].strip(" ]"))
+                print('\t' + hist[i].strip(" '") + '\t' + hist[i+1].strip(" ]"))
 
 def printReset(r):
     reply = r.split(',')
@@ -65,7 +63,7 @@ def printReset(r):
     for i in range(18):
         if ans[i].isalpha():
             answer += ans[i]
-    print("Previous answer: " + answer + " with " + str(reply[5]) + " guesses remaining.")
+    print("\r\nPrevious answer: " + answer + " with " + str(reply[5]) + " guesses remaining.")
     print("New Game Started\r\n")
 
 
@@ -97,12 +95,12 @@ print("\r\nWelcome to Mastermind!")
 try:
     reply, addr = sendM('HISTORY')
     print("Successful connection to " + str(addr[0]) + " on port " + str(addr[1]))
-    print("\r\nCurrent Server State: ")
-    printHistory(reply)
-    print("\r\nEnter a four letter guess or ? for help\r\n")
 except:
     print("Failed to make initial connection to server:",sys.exc_info()[0])
     exit()
+print("\r\nCurrent Server State: ")
+printHistory(reply.decode())
+print("\r\nEnter a four letter guess or ? for help!\r\n")
 
 # Main loop for game
 while playing:
@@ -127,7 +125,7 @@ while playing:
         print(str(nums[1]) + " letters correct, " + str(nums[2]) + ' guesses remaining')
         if int(nums[1]) == 4:
             (r1, sa) = c_socket.recvfrom(buffer_size)
-            print("You Won!")
+            print("\r\nYou Won!")
             printReset(r1.decode())
         elif int(nums[2]) == 0:
             (r1, sa) = c_socket.recvfrom(buffer_size)
