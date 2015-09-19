@@ -116,7 +116,10 @@ while True:
     print("Client address: ", cAddress)
     # Handle client message
     if cData == 'RESET':
-        replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
+        ans = ''
+        for i in range(4):
+            ans += answer[i]
+        replyM('RESET_REPLY, ' + str(ans) + ', ' + str(nGuess))
         newGame()
     elif cData == 'HISTORY':
         if len(record) == 0:

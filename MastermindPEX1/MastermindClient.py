@@ -54,16 +54,9 @@ def printHistory(h):
                 print('\t' + hist[i].strip(" '") + '\t' + hist[i+1].strip(" ]"))
 
 def printReset(r):
+    r = r.lstrip('RESET_REPLY,')
     reply = r.split(',')
-    ans = str(reply[1])
-    ans += str(reply[2])
-    ans += str(reply[3])
-    ans += str(reply[4])
-    answer = ''
-    for i in range(18):
-        if ans[i].isalpha():
-            answer += ans[i]
-    print("\r\nPrevious answer: " + answer + " with " + str(reply[5]) + " guesses remaining.")
+    print("\r\nPrevious answer: " + reply[0] + " with " + reply[1] + " guesses remaining.")
     print("New Game Started\r\n")
 
 
