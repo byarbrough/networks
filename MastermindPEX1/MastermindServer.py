@@ -87,16 +87,21 @@ def handleGuess(g):
     record.append(nCorrect)
     # Check for wins/ losses, reply to user
     if nCorrect == 4: # Win
+        ans = ''
+        for i in range(4):
+            ans += answer[i]
         replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
         print('Client Win')
-        replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
+        replyM('RESET_REPLY, ' + str(ans) + ', ' + str(nGuess))
         newGame()
     else: # Incorrect answer
         nGuess -= 1
         if nGuess <= 0: # Loss
-            replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
+            ans = ''
+            for i in range(4):
+                ans += answer[i]
             print('Client Loss')
-            replyM('RESET_REPLY, ' + str(answer) + ', ' + str(nGuess))
+            replyM('RESET_REPLY, ' + str(ans) + ', ' + str(nGuess))
             newGame()
         else: # Keep guessing
             replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
