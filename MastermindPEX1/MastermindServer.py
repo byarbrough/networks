@@ -97,9 +97,6 @@ def handleGuess(g):
     else: # Incorrect answer
         nGuess -= 1
         if nGuess <= 0: # Loss
-            ans = ''
-            for i in range(4):
-                ans += answer[i]
             print('Client Loss')
             replyM('RESET_REPLY, ' + str(ans) + ', ' + str(nGuess))
             newGame()
