@@ -55,7 +55,7 @@ def newGame():
 
 def replyM(m):
     m = m.upper()
-    print('Response; ' + m)
+    print('Response: ' + m)
     try:
         s_socket.sendto(m.encode('utf-8'), cAddress)
     except:
@@ -110,7 +110,7 @@ while True:
 
     # Wait for message from client
     (cData, cAddress) = s_socket.recvfrom(buffer_size)
-    cData = cData.decode()
+    cData = cData.decode().upper()
 
     print("Message: ", cData)
     print("Client address: ", cAddress)
@@ -123,10 +123,9 @@ while True:
         newGame()
     elif cData == 'HISTORY':
         if len(record) == 0:
-            replyM('HISTORY_REPLY')
+            replyM('HISTORY_REPLY,')
         else:
             reply = 'HISTORY_REPLY,' + str(record).strip('[]')
-            print('Reply will be: ', reply)
             replyM(reply)
     elif cData.startswith('GUESS,'):
         handleGuess(cData)
