@@ -97,7 +97,12 @@ def handleGuess(g):
     else: # Incorrect answer
         nGuess -= 1
         if nGuess <= 0: # Loss
+            ans = ''
+            for i in range(4):
+                ans += answer[i]
+            replyM('FEEDBACK_REPLY, ' + str(nCorrect) + ', ' + str(nGuess))
             print('Client Loss')
+            s_socket.recvfrom(buffer_size)
             replyM('RESET_REPLY, ' + str(ans) + ', ' + str(nGuess))
             newGame()
         else: # Keep guessing
