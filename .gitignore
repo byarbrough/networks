@@ -1,7 +1,7 @@
 !.gitignore
 
-
 /Examples
 /Docs
 /*/.idea
 *.docx
+CS467/

@@ -4,7 +4,7 @@
     Author: Brian Yarbrough, November 2015
         Adopted from Dr. Brown TCP Demo Code
 
-    
+
 """
 
 # The socket library allows for the creation and use of the TCP and UDP protocols.
