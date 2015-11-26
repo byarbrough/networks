@@ -10,10 +10,24 @@
 # The socket library allows for the creation and use of the TCP and UDP protocols.
 # See https://docs.python.org/3/library/socket.html
 import socket
+import sys
 
 
 # ---------------------------------------------------------------------
 def main():
+
+    # get URL from command line
+    URL = ""
+    if(len(sys.argv)==2):
+        try:
+            URL = sys.argv[1]
+        except TypeError:
+            print("Argument: Invalid URL")
+    elif len(sys.argv) > 2:
+        raise SyntaxError("Server only excepts one argument <URL>")
+
+    print('Contacting ',URL)
+
     # Create a new socket to communicate with a remote server
     #   AF_INET means we want an IPv4 protocol
     #   SOCK_STREAM means we want to communicate using a TCP stream
@@ -24,9 +38,9 @@ def main():
     # server. The server and the client have now agreed on how they will number the packets
     # so that they can guarantee accurate delivery.
     # The parameter to the connect function is a tuple: (address, port_number)
-    server_name = '127.0.0.1'  # localhost
-    server_port = 1055
-    print('connecting to %s on port %s'.format(server_name, server_port))
+    server_name = socket.gethostbyname(URL)
+    server_port = 80
+    print('Fetching RSS from %s on port %s'.format(server_name, server_port))
     my_socket.connect((server_name, server_port))
 
     # The size of the TCP receive buffer
