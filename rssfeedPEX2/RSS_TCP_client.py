@@ -29,7 +29,6 @@ def main():
 
     # parse the URL
     (scheme,netloc,path,params,query,fragment) = urlparse(URL)
-
     # new TCP socket on random port
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -43,11 +42,10 @@ def main():
     buffer_size = 16
 
     try:
-        # Send the server a message.
-        # The first parameter is a byte array. The prefix b' makes the string a byte array. Note that
-        # TCP might break the message into smaller packets before it sends the data to the server.
-        message = b'GET '
-        print('sending "' + str(message) + '" to the server.')
+        # request RSS feed from server
+        print("GET " + path + " HTTP/1.1\n" + "HOST: " + server_name + "\n\n")
+        message = b'"GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + "\n\n"'
+        print('sending\r\n"' + str(message) + '"\r\nto the server.')
         my_socket.sendall(message)
 
         # Wait for the response from the server. Because the server might send the
