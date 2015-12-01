@@ -11,6 +11,7 @@
 # See https://docs.python.org/3/library/socket.html
 import socket
 import sys
+from urllib.parse import urlparse
 
 
 # ---------------------------------------------------------------------
@@ -26,21 +27,16 @@ def main():
     elif len(sys.argv) > 2:
         raise SyntaxError("Server only excepts one argument <URL>")
 
-    print('Contacting ',URL)
+    # parse the URL
+    (scheme,netloc,path,params,query,fragment) = urlparse(URL)
 
-    # Create a new socket to communicate with a remote server
-    #   AF_INET means we want an IPv4 protocol
-    #   SOCK_STREAM means we want to communicate using a TCP stream
-    # The socket is assigned a random port number. Clients typically have random port numbers.
+    # new TCP socket on random port
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Create a TCP virtual connection to the server. This does the 3-way handshake with the
-    # server. The server and the client have now agreed on how they will number the packets
-    # so that they can guarantee accurate delivery.
-    # The parameter to the connect function is a tuple: (address, port_number)
-    server_name = socket.gethostbyname(URL)
+    # Open TCP to IP address
+    server_name = socket.gethostbyname(netloc)
     server_port = 80
-    print('Fetching RSS from %s on port %s'.format(server_name, server_port))
+    print('Fetching RSS from {} on port {}'.format(server_name, server_port))
     my_socket.connect((server_name, server_port))
 
     # The size of the TCP receive buffer
@@ -50,7 +46,7 @@ def main():
         # Send the server a message.
         # The first parameter is a byte array. The prefix b' makes the string a byte array. Note that
         # TCP might break the message into smaller packets before it sends the data to the server.
-        message = b'This is a long request to show how streaming works! It is only a test!'
+        message = b'GET '
         print('sending "' + str(message) + '" to the server.')
         my_socket.sendall(message)
 
