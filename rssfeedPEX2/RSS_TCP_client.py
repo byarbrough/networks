@@ -43,10 +43,9 @@ def main():
 
     try:
         # request RSS feed from server
-        print("GET " + path + " HTTP/1.1\n" + "HOST: " + server_name + "\n\n")
-        message = b'"GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + "\n\n"'
-        print('sending\r\n"' + str(message) + '"\r\nto the server.')
-        my_socket.sendall(message)
+        message = "GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + "\n\n"
+        print('sending:\r\n"' + str(message) + '"\r\nto the server.')
+        my_socket.sendall(message.encode('utf-8'))
 
         # Wait for the response from the server. Because the server might send the
         # response in multiple packets, we need to potentially call recv multiple times.
