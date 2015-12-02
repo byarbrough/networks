@@ -43,7 +43,7 @@ def main():
 
     try:
         # request RSS feed from server
-        message = "GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + "\n\n"
+        message = "GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + " \n\n"
         print('sending:\r\n"' + str(message) + '"\r\nto the server.')
         my_socket.sendall(message.encode('utf-8'))
 
