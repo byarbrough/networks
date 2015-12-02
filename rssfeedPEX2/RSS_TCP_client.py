@@ -41,26 +41,17 @@ def main():
         message = "GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + " \n\n"
         my_socket.sendall(message.encode('utf-8'))
 
-        # Wait for the response from the server. Because the server might send the
-        # response in multiple packets, we need to potentially call recv multiple times.
-        # Note that recv function blocks until there is data in the TCP receive buffer.
-        amount_received = 0
-
-        # This is based on the fact that the server is going to echo the message back to the
-        # client. In a more normal case, you would read the input buffer until you found a
-        # special character that was recognized as the "end of message" character. OR,
-        # the server would include in its response the size of the message that is coming.
-        amount_expected = len(message)
         total_response = ""
+        response = ""
 
-        while amount_received < amount_expected:
-            response = my_socket.recv(buffer_size)
-            print("Server response: ", response)
-            amount_received += len(response)
+        # run until end of rss feed
+        while '</rss>' not in response:
+            # recieve from server
+            response = my_socket.recv(buffer_size).decode('utf8', 'replace')
             # build response from multiple packets
-            total_response += response.decode('utf8', 'replace')
+            total_response += response
 
-        print("The total response from the server was:\n" + total_response)
+        print(total_response)
 
     finally:
         # Close the socket, which releases all of the memory resources the socket used.
