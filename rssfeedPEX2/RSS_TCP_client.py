@@ -6,13 +6,9 @@
 
 
 """
-
-# The socket library allows for the creation and use of the TCP and UDP protocols.
-# See https://docs.python.org/3/library/socket.html
 import socket
 import sys
 from urllib.parse import urlparse
-
 
 # ---------------------------------------------------------------------
 def main():
@@ -26,25 +22,23 @@ def main():
             print("Argument: Invalid URL")
     elif len(sys.argv) > 2:
         raise SyntaxError("Server only excepts one argument <URL>")
-
     # parse the URL
     (scheme,netloc,path,params,query,fragment) = urlparse(URL)
+
     # new TCP socket on random port
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     # Open TCP to IP address
-    server_name = socket.gethostbyname(netloc)
+    server_addr = socket.gethostbyname(netloc)
     server_port = 80
-    print('Fetching RSS from {} on port {}'.format(server_name, server_port))
-    my_socket.connect((server_name, server_port))
+    print('Fetching RSS from {} on port {}'.format(server_addr, server_port))
+    my_socket.connect((server_addr, server_port))
 
     # The size of the TCP receive buffer
-    buffer_size = 16
+    buffer_size = 1024
 
     try:
         # request RSS feed from server
         message = "GET " + path + " HTTP/1.1\n" + "HOST: " + netloc + " \n\n"
-        print('sending:\r\n"' + str(message) + '"\r\nto the server.')
         my_socket.sendall(message.encode('utf-8'))
 
         # Wait for the response from the server. Because the server might send the
