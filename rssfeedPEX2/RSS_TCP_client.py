@@ -120,25 +120,26 @@ def prompt(my_socket, netloc, rss):
             print('enter an article number to open it')
         elif choice.isdigit():
             if int(choice) < len(rss):
-                # get article  from server
-                print('Opening',(rss[int(choice)])[0])
-                (scheme,netloc,path,params,query,fragment) = urlparse((rss[int(choice)])[1])
-                web_page = receive_content_length(my_socket, path, netloc)
-                # Save the web page to a file
-                filename = os.path.dirname(__file__) + "/temp.html"
-                print("Saving web page to ... -->", filename)
-                with open(filename, 'w') as f:
-                    f.write(web_page)
-
-                # Open the file in the default web browser
-                print("Opening the web page in a browser")
-                webbrowser.open('file://' + filename)
-
-
+                open_article(my_socket, rss[int(choice)])
             else:
                 print('No such article in this feed')
         # prompt user
         choice = input('\nEnter article number you wish to open: ').lower()
+
+
+def open_article(my_socket, rss):
+    # get article  from server
+    print('Opening',rss[0])
+    (scheme,netloc,path,params,query,fragment) = urlparse(rss[1])
+    web_page = receive_content_length(my_socket, path, netloc)
+    # Save the web page to a file
+    filename = os.path.dirname(__file__) + "/temp.html"
+    print("Saving web page to ... -->", filename)
+    with open(filename, 'w') as f:
+        f.write(web_page)
+    # Open the file in the default web browser
+    print("Opening the web page in a browser")
+    webbrowser.open('file://' + filename)
 
 
 def parseXML(text):
