@@ -33,6 +33,19 @@ def main():
     print('Fetching RSS from {} on port {}'.format(server_addr, server_port))
     my_socket.connect((server_addr, server_port))
 
+    # get RSS
+    try:
+        receive_content_length(my_socket,path,netloc)
+    except socket.timeout:
+        print("Did not receive response from server; server possibly down.")
+    except ConnectionResetError:
+        print("Error: connection to server reset")
+    except:
+        print("Unexpected error: ", sys.exc_info()[0])
+
+
+def receive_content_length(my_socket,path,netloc):
+
     # The size of the TCP receive buffer
     buffer_size = 1024
 
@@ -45,7 +58,7 @@ def main():
         amount_expected = 1024
         amount_received = 0
         total_response = ""
-        # recieve the first buffer worth
+        # receive the first buffer worth
         while amount_received < amount_expected:
             h_response = my_socket.recv(buffer_size)
             amount_received += len(h_response)
@@ -75,6 +88,8 @@ def main():
 
         print("The total response from the server was:\n" + total_response)
 
+
+    # finsih up
     finally:
         # Close the socket, which releases all of the memory resources the socket used.
         my_socket.close()
