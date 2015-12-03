@@ -12,7 +12,11 @@ from bs4 import BeautifulSoup
 import os, webbrowser
 
 # ---------------------------------------------------------------------
+
+
 def main():
+
+    print("Welcome to Brian's RSS Browser\nSelect articles to open\nuUse 'h' for help")
 
     # get URL from command line
     URL = ""
@@ -53,11 +57,34 @@ def main():
 
     # parse the xml
     rss_pretty = parseXML(rss_raw)
-    # display the articles
-    for i in range(0,len(rss_pretty)):
-        print(i,rss_pretty[i])
+
+    # prompt user
+    choice = 'display'
+    while choice != 'q':
+        if choice == 'display':
+            # display the articles
+            for i in range(0,len(rss_pretty)):
+                print(i,rss_pretty[i])
+        elif choice == 'h':
+            # help menu
+            print("Help Menu")
+            print('display : show article choices ')
+            print('q : exit')
+            print('enter an article number to open it')
+        elif choice.isdigit():
+            if int(choice) < len(rss_pretty):
+                # get article  from server
+                print('Opening',(rss_pretty[int(choice)])[0])
+                
+            else:
+                print('No such article in this feed')
+        # prompt user
+        choice = input('\nEnter article number you wish to open: ').lower()
+
+    print('Goodbye!')
     # Delete the socket from memory
     del my_socket
+
 
 def receive_content_length(my_socket,path,netloc):
 
