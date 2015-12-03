@@ -16,8 +16,6 @@ import os, webbrowser
 
 def main():
 
-    print("\nWelcome to Brian's RSS Browser\n\nSelect articles to open\nUse 'h' for help\n")
-
     # get URL from command line
     url = ""
     if len(sys.argv) == 2:
@@ -30,6 +28,12 @@ def main():
 
     # parse the URL
     (scheme,netloc,path,params,query,fragment) = urlparse(url)
+    # check validitiy
+    if netloc == "" or path == "":
+        raise SyntaxError('Invalid URL: "' + url + '"')
+        exit()
+
+    print("\nWelcome to Brian's RSS Browser\n\nSelect articles to open\nUse 'h' for help\n")
 
     # new TCP socket on random port
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -42,7 +46,7 @@ def main():
         # TCP connection
         my_socket.connect((server_addr, server_port))
         # get the feed
-        rss_raw = receive_content_length(my_socket, path, netloc)
+        rss_raw = receive_content(my_socket, path, netloc)
         # parse the xml
         rss_pretty = parseXML(rss_raw)
         # interact with user
@@ -80,7 +84,7 @@ def receive_content_length(my_socket, path, netloc):
     while amount_received < amount_expected:
         h_response = my_socket.recv(buffer_size)
         amount_received += len(h_response)
-        total_response += h_response.decode('utf8', 'replace')
+        total_response += h_response.decode('UTF-8', 'ignore')
 
     # get expected length from HTTP header
     try:
@@ -100,7 +104,7 @@ def receive_content_length(my_socket, path, netloc):
         response = my_socket.recv(buffer_size)
         amount_received += len(response)
         # build response from multiple packets
-        total_response += response.decode('utf8', 'replace')
+        total_response += response.decode('UTF-8', 'ignore')
 
     return total_response
 
@@ -156,8 +160,6 @@ def parseXML(text):
         link = oneItem.find('link').text
 
         articles.append((title, link))
-    print(articles)
-
     return articles
 
 
