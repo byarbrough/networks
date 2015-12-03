@@ -28,7 +28,7 @@ def main():
 
     # parse the URL
     (scheme,netloc,path,params,query,fragment) = urlparse(url)
-    # check validitiy
+    # check valid
     if netloc == "" or path == "":
         raise SyntaxError('Invalid URL: "' + url + '"')
         exit()
@@ -110,17 +110,31 @@ def receive_content(my_socket, path, netloc):
     # receive chunked transfer
     elif 'Transfer-Encoding: chunked' in total_response:
         print('Getting based on Chunked Transfer')
-        print(total_response)
         head_end = total_response.index('\r\n\r\n')
         total_response = total_response[head_end+4:]
         # chunk length is hex number at start of chunk
-        print('new',total_response)
-        print('indx',total_response.index('\n'))
-        print('hex val',total_response[:total_response.index('\n')])
         next_length = int(total_response[:total_response.index('\n')], 16)
-        print('next_length', next_length)
+        amount_received = len(total_response[total_response.index('\n'):])
 
+        # continue fetching
+        while next_length != 0:
+            print('next length:', next_length)
+            response = ""
+            while amount_received < next_length:
+                response = my_socket.recv(buffer_size)
+                amount_received += len(response)
+                print('amt_rcv:',amount_received)
+                # build response from multiple packets
+                total_response += response.decode('UTF-8', 'ignore')
+            # get length of next chunk
+            foo = my_socket.recv(6)
+            fdec = foo.decode('UTF-8', 'ignore')
+            next_length = int(fdec, 16)
+            print(foo, fdec, next_length)
+            amount_received = 0
+            print(total_response)
         return total_response
+
     else:
         raise ValueError('Transfer protocol not supported')
 
