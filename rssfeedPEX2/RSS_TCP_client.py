@@ -67,7 +67,7 @@ def main():
     del my_socket
 
 
-def receive_content_length(my_socket, path, netloc):
+def receive_content(my_socket, path, netloc):
 
     # The size of the TCP receive buffer
     buffer_size = 1024
@@ -86,8 +86,10 @@ def receive_content_length(my_socket, path, netloc):
         amount_received += len(h_response)
         total_response += h_response.decode('UTF-8', 'ignore')
 
-    # get expected length from HTTP header
-    try:
+    # content length transfer
+    if 'Content-Length' in total_response:
+        print('Getting based on Content-Length')
+        # get expected length from HTTP header
         index_content_length = total_response.index('Content-Length')
         nums = [int(s) for s in total_response[index_content_length:].split() if s.isdigit()]
         content_length = nums[0]
@@ -96,17 +98,31 @@ def receive_content_length(my_socket, path, netloc):
         total_response = total_response[head_end:]
         amount_expected = content_length - (1020-head_end)
         amount_received = 0
-    except ValueError:
-        print('Content-Length absent from header')
 
-    # get up to that length
-    while amount_received < amount_expected:
-        response = my_socket.recv(buffer_size)
-        amount_received += len(response)
-        # build response from multiple packets
-        total_response += response.decode('UTF-8', 'ignore')
+        # get up to that length
+        while amount_received < amount_expected:
+            response = my_socket.recv(buffer_size)
+            amount_received += len(response)
+            # build response from multiple packets
+            total_response += response.decode('UTF-8', 'ignore')
 
-    return total_response
+        return total_response
+    # receive chunked transfer
+    elif 'Transfer-Encoding: chunked' in total_response:
+        print('Getting based on Chunked Transfer')
+        print(total_response)
+        head_end = total_response.index('\r\n\r\n')
+        total_response = total_response[head_end+4:]
+        # chunk length is hex number at start of chunk
+        print('new',total_response)
+        print('indx',total_response.index('\n'))
+        print('hex val',total_response[:total_response.index('\n')])
+        next_length = int(total_response[:total_response.index('\n')], 16)
+        print('next_length', next_length)
+
+        return total_response
+    else:
+        raise ValueError('Transfer protocol not supported')
 
 
 def prompt(my_socket, netloc, rss):
@@ -136,7 +152,7 @@ def open_article(my_socket, rss):
     # get article  from server
     print('Opening',rss[0])
     (scheme,netloc,path,params,query,fragment) = urlparse(rss[1])
-    web_page = receive_content_length(my_socket, path, netloc)
+    web_page = receive_content(my_socket, path, netloc)
     # Save the web page to a file
     filename = os.path.dirname(__file__) + "/temp.html"
     print("Saving web page to ... -->", filename)
