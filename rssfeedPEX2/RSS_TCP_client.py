@@ -16,19 +16,20 @@ import os, webbrowser
 
 def main():
 
-    print("Welcome to Brian's RSS Browser\nSelect articles to open\nuUse 'h' for help")
+    print("\nWelcome to Brian's RSS Browser\n\nSelect articles to open\nUse 'h' for help\n")
 
     # get URL from command line
-    URL = ""
-    if(len(sys.argv)==2):
+    url = ""
+    if len(sys.argv) == 2:
         try:
-            URL = sys.argv[1]
+            url = sys.argv[1]
         except TypeError:
             print("Argument: Invalid URL")
-    elif len(sys.argv) > 2:
+    else:
         raise SyntaxError("Server only excepts one argument <URL>")
+
     # parse the URL
-    (scheme,netloc,path,params,query,fragment) = urlparse(URL)
+    (scheme,netloc,path,params,query,fragment) = urlparse(url)
 
     # new TCP socket on random port
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -155,6 +156,7 @@ def parseXML(text):
         link = oneItem.find('link').text
 
         articles.append((title, link))
+    print(articles)
 
     return articles
 
