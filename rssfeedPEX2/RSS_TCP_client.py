@@ -37,13 +37,15 @@ def main():
     server_port = 80
     print('Fetching RSS from {} on port {}'.format(server_addr, server_port))
 
-    rss_raw = ""
     try:
         # TCP connection
         my_socket.connect((server_addr, server_port))
-
         # get the feed
-        rss_raw = receive_content_length(my_socket,path,netloc)
+        rss_raw = receive_content_length(my_socket, path, netloc)
+        # parse the xml
+        rss_pretty = parseXML(rss_raw)
+        # interact with user
+        prompt(my_socket, netloc, rss_pretty)
 
     except socket.timeout:
         print("Did not receive response from server; server possibly down.")
@@ -55,38 +57,12 @@ def main():
         # close socket and free up memory
         my_socket.close()
 
-    # parse the xml
-    rss_pretty = parseXML(rss_raw)
-
-    # prompt user
-    choice = 'display'
-    while choice != 'q':
-        if choice == 'display':
-            # display the articles
-            for i in range(0,len(rss_pretty)):
-                print(i,rss_pretty[i])
-        elif choice == 'h':
-            # help menu
-            print("Help Menu")
-            print('display : show article choices ')
-            print('q : exit')
-            print('enter an article number to open it')
-        elif choice.isdigit():
-            if int(choice) < len(rss_pretty):
-                # get article  from server
-                print('Opening',(rss_pretty[int(choice)])[0])
-                
-            else:
-                print('No such article in this feed')
-        # prompt user
-        choice = input('\nEnter article number you wish to open: ').lower()
-
     print('Goodbye!')
     # Delete the socket from memory
     del my_socket
 
 
-def receive_content_length(my_socket,path,netloc):
+def receive_content_length(my_socket, path, netloc):
 
     # The size of the TCP receive buffer
     buffer_size = 1024
@@ -126,6 +102,43 @@ def receive_content_length(my_socket,path,netloc):
         total_response += response.decode('utf8', 'replace')
 
     return total_response
+
+
+def prompt(my_socket, netloc, rss):
+    # prompt user
+    choice = 'display'
+    while choice != 'q':
+        if choice == 'display':
+            # display the articles
+            for i in range(0,len(rss)):
+                print(i,rss[i])
+        elif choice == 'h':
+            # help menu
+            print("Help Menu")
+            print('display : show article choices ')
+            print('q : exit')
+            print('enter an article number to open it')
+        elif choice.isdigit():
+            if int(choice) < len(rss):
+                # get article  from server
+                print('Opening',(rss[int(choice)])[0])
+                (scheme,netloc,path,params,query,fragment) = urlparse((rss[int(choice)])[1])
+                web_page = receive_content_length(my_socket, path, netloc)
+                # Save the web page to a file
+                filename = os.path.dirname(__file__) + "/temp.html"
+                print("Saving web page to ... -->", filename)
+                with open(filename, 'w') as f:
+                    f.write(web_page)
+
+                # Open the file in the default web browser
+                print("Opening the web page in a browser")
+                webbrowser.open('file://' + filename)
+
+
+            else:
+                print('No such article in this feed')
+        # prompt user
+        choice = input('\nEnter article number you wish to open: ').lower()
 
 
 def parseXML(text):
