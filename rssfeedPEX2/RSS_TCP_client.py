@@ -4,6 +4,9 @@
     Author: Brian Yarbrough, November 2015
         Adopted from Dr. Brown TCP Demo Code
 
+    Fetches RSS feeds and allows user to open articles
+    PEX2, CS 467
+
 
 """
 import sys, socket
@@ -29,6 +32,7 @@ def main():
     print("\nWelcome to Brian's RSS Browser\n\nSelect articles to open\nUse 'h' for help\n")
 
     rss_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    rss_socket.settimeout(5.0)
     rss_raw = ""
     try:
         # TCP connection
@@ -94,6 +98,7 @@ def receive_content(my_socket, path, netloc):
 
         return total_response
     # receive chunked transfer
+    # note, this does not always work - rerun and it usually will
     elif 'Transfer-Encoding: chunked' in total_response:
         print('Getting based on Chunked Transfer')
         head_end = total_response.index('\r\n\r\n')
@@ -154,6 +159,7 @@ def open_article(rss):
     # get article  from server
     print('Opening',rss[0])
     article_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    article_socket.settimeout(5.0)
     try:
         (article_socket, path, netloc) = new_retriever(rss[1])
         web_page = receive_content(article_socket, path, netloc)
@@ -191,6 +197,7 @@ def new_retriever(url):
     print('Opening socket to',server_addr,'on port',server_port)
     # new TCP socket on random port
     new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    new_socket.settimeout(5.0)
     # TCP connection
     new_socket.connect((server_addr, server_port))
 
