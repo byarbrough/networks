@@ -26,32 +26,16 @@ def main():
     else:
         raise SyntaxError("Server only excepts one argument <URL>")
 
-    # parse the URL
-    (scheme,netloc,path,params,query,fragment) = urlparse(url)
-    # check valid
-    if netloc == "" or path == "":
-        raise SyntaxError('Invalid URL: "' + url + '"')
-        exit()
-
     print("\nWelcome to Brian's RSS Browser\n\nSelect articles to open\nUse 'h' for help\n")
 
-    # new TCP socket on random port
-    my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Open TCP to IP address
-    server_addr = socket.gethostbyname(netloc)
-    server_port = 80
-    print('Fetching RSS from {} on port {}'.format(server_addr, server_port))
-
+    rss_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    rss_raw = ""
     try:
         # TCP connection
-        my_socket.connect((server_addr, server_port))
+        (rss_socket, path, netloc) = new_retriever(url)
         # get the feed
-        rss_raw = receive_content(my_socket, path, netloc)
-        # parse the xml
-        rss_pretty = parseXML(rss_raw)
-        # interact with user
-        prompt(my_socket, netloc, rss_pretty)
-
+        print('getting feed')
+        rss_raw = receive_content(rss_socket, path, netloc)
     except socket.timeout:
         print("Did not receive response from server; server possibly down.")
     except ConnectionResetError:
@@ -60,15 +44,17 @@ def main():
         print("Unexpected error: ", sys.exc_info()[0])
     finally:
         # close socket and free up memory
-        my_socket.close()
+        rss_socket.close()
+        del rss_socket
 
-    print('Goodbye!')
-    # Delete the socket from memory
-    del my_socket
+    # parse the xml
+    rss_pretty = parseXML(rss_raw)
+    # interact with user until exit
+    prompt(rss_pretty)
 
 
 def receive_content(my_socket, path, netloc):
-
+    print('Communicating...')
     # The size of the TCP receive buffer
     buffer_size = 1024
 
@@ -139,7 +125,7 @@ def receive_content(my_socket, path, netloc):
         raise ValueError('Transfer protocol not supported')
 
 
-def prompt(my_socket, netloc, rss):
+def prompt(rss):
     # prompt user
     choice = 'display'
     while choice != 'q':
@@ -155,18 +141,33 @@ def prompt(my_socket, netloc, rss):
             print('enter an article number to open it')
         elif choice.isdigit():
             if int(choice) < len(rss):
-                open_article(my_socket, rss[int(choice)])
+                open_article(rss[int(choice)])
             else:
                 print('No such article in this feed')
         # prompt user
         choice = input('\nEnter article number you wish to open: ').lower()
+    # program exit
+    print('Goodbye!')
 
 
-def open_article(my_socket, rss):
+def open_article(rss):
     # get article  from server
     print('Opening',rss[0])
-    (scheme,netloc,path,params,query,fragment) = urlparse(rss[1])
-    web_page = receive_content(my_socket, path, netloc)
+    article_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        (article_socket, path, netloc) = new_retriever(rss[1])
+        web_page = receive_content(article_socket, path, netloc)
+    except socket.timeout:
+        print("Did not receive response from server; server possibly down.")
+    except ConnectionResetError:
+        print("Error: connection to server reset")
+    except:
+        print("Unexpected error: ", sys.exc_info()[0])
+    finally:
+        # close socket and free up memory
+        article_socket.close()
+        del article_socket
+
     # Save the web page to a file
     filename = os.path.dirname(__file__) + "/temp.html"
     print("Saving web page to ... -->", filename)
@@ -175,6 +176,25 @@ def open_article(my_socket, rss):
     # Open the file in the default web browser
     print("Opening the web page in a browser")
     webbrowser.open('file://' + filename)
+
+
+def new_retriever(url):
+    # parse URL
+    (scheme,netloc,path,params,query,fragment) = urlparse(url)
+    # check if valid
+    if netloc == "" or path == "":
+        raise SyntaxError('Invalid URL: "' + url + '"')
+        exit()
+    # Open TCP to IP address
+    server_addr = socket.gethostbyname(netloc)
+    server_port = 80
+    print('Opening socket to',server_addr,'on port',server_port)
+    # new TCP socket on random port
+    new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # TCP connection
+    new_socket.connect((server_addr, server_port))
+
+    return new_socket, path, netloc
 
 
 def parseXML(text):
