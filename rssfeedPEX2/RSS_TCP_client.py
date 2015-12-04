@@ -118,21 +118,25 @@ def receive_content(my_socket, path, netloc):
 
         # continue fetching
         while next_length != 0:
-            print('next length:', next_length)
             response = ""
-            while amount_received < next_length:
+            print('loop')
+            while amount_received < next_length+4:
                 response = my_socket.recv(buffer_size)
                 amount_received += len(response)
-                print('amt_rcv:',amount_received)
+                print('amt',amount_received)
                 # build response from multiple packets
                 total_response += response.decode('UTF-8', 'ignore')
             # get length of next chunk
-            foo = my_socket.recv(6)
-            fdec = foo.decode('UTF-8', 'ignore')
-            next_length = int(fdec, 16)
-            print(foo, fdec, next_length)
+            print('last response',response)
+            r_split = response.decode('UTF-8', 'ignore').splitlines()
+            for line in reversed(r_split):
+                if line != '' and '<' not in line and '>' not in line:
+                    print('line is',line)
+                    next_length = int(line, 16)
+                    break
+            print('next',next_length)
             amount_received = 0
-            print(total_response)
+
         return total_response
 
     else:
